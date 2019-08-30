@@ -1,10 +1,12 @@
+
 package gui;
 
-
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,12 +49,15 @@ public class SellerFormController implements Initializable {
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
 	@FXML
+
 	private TextField txtId;
 
 	@FXML
+
 	private TextField txtName;
 
 	@FXML
+
 	private TextField txtEmail;
 
 	@FXML
@@ -91,15 +96,10 @@ public class SellerFormController implements Initializable {
 
 	private Button btCancel;
 
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		initializeNodes();
-
-	}
-
 	private ObservableList<Department> obsList;
 
 	public void setSeller(Seller entity) {
+
 		this.entity = entity;
 
 	}
@@ -145,11 +145,15 @@ public class SellerFormController implements Initializable {
 			Utils.currentStage(event).close();
 
 		} catch (ValidationException e) {
+
 			setErrorMessages(e.getErrors());
 
 		} catch (DbException e) {
+
 			Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
+
 		}
+
 	}
 
 	private void notifyDataChangeListeners() {
@@ -178,6 +182,38 @@ public class SellerFormController implements Initializable {
 
 		obj.setName(txtName.getText());
 
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+
+			exception.addError("email", "Field can't be empty");
+
+		}
+
+		obj.setEmail(txtEmail.getText());
+
+		if (dpBirthDate.getValue() == null) {
+
+			exception.addError("birthDate", "Field can't be empty");
+
+		}
+
+		else {
+
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+
+			obj.setBirthDate(Date.from(instant));
+
+		}
+
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+
+			exception.addError("baseSalary", "Field can't be empty");
+
+		}
+
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+
+		obj.setDepartment(comboBoxDepartment.getValue());
+
 		if (exception.getErrors().size() > 0) {
 
 			throw exception;
@@ -193,6 +229,14 @@ public class SellerFormController implements Initializable {
 	public void onBtCancelAction(ActionEvent event) {
 
 		Utils.currentStage(event).close();
+
+	}
+
+	@Override
+
+	public void initialize(URL url, ResourceBundle rb) {
+
+		initializeNodes();
 
 	}
 
@@ -268,11 +312,13 @@ public class SellerFormController implements Initializable {
 
 		Set<String> fields = errors.keySet();
 
-		if (fields.contains("name")) {
+		labelErrorName.setText((fields.contains("name") ? errors.get("name") : ""));
 
-			labelErrorName.setText(errors.get("name"));
+		labelErrorEmail.setText((fields.contains("email") ? errors.get("email") : ""));
 
-		}
+		labelErrorBirthDate.setText((fields.contains("birthDate") ? errors.get("birthDate") : ""));
+
+		labelErrorBaseSalary.setText((fields.contains("baseSalary") ? errors.get("baseSalary") : ""));
 
 	}
 
