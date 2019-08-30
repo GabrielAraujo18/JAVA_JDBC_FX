@@ -1,6 +1,7 @@
 package gui;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -41,6 +42,15 @@ public class SellerListController implements Initializable, DataChangeListener {
 	private TableColumn<Seller, String> tablecolumnName;
 
 	@FXML
+	private TableColumn<Seller, String> tablecolumnEmail;
+
+	@FXML
+	private TableColumn<Seller, Date> tablecolumnBirthDate;
+
+	@FXML
+	private TableColumn<Seller, Double> tablecolumnBaseSalary;
+
+	@FXML
 	private TableColumn<Seller, Seller> tableColumnEDIT;
 
 	@FXML
@@ -69,9 +79,13 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	private void initializeNodes() {
 		tablecolumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
-
 		tablecolumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-
+		tablecolumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+		tablecolumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+		tablecolumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+		Utils.formatTableColumnDate(tablecolumnBirthDate, "dd/MM/yyyy");
+		Utils.formatTableColumnDouble(tablecolumnBaseSalary, 2);
+		
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 
 		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
@@ -115,7 +129,6 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	}
 
-	
 	@Override
 	public void onDataChanged() {
 		updateTableView();
@@ -137,8 +150,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 				}
 
 				setGraphic(button);
-				button.setOnAction(
-						event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
+				button.setOnAction(event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
 			}
 		});
 	}
@@ -175,9 +187,9 @@ public class SellerListController implements Initializable, DataChangeListener {
 				updateTableView();
 			} catch (DbIntegrityException e) {
 				Alerts.showAlert("Error removing", null, e.getMessage(), AlertType.ERROR);
-				
+
 			}
-			
+
 		}
 	}
 
